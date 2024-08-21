@@ -23,24 +23,31 @@ public:
     ~NET_SOCKET();
 
 private:
-    int fdSocketFromNet;
-    int fdSocketToNet;
+    unsigned char nodeID;
 
-    int portFromNet;
-    int portToNet;
+    int fdSocketFromApp;
+    int fdSocketToApp;
 
-    string ipFromNet;
-    string ipToNet;
+    int portFromApp;
+    int portToApp;
+
+    string ipFromApp;
+    string ipToApp;
 
     unsigned char* receiveBuffer[MAX_MESSAGE_LENGTH];
     unsigned char* sendBuffer[MAX_MESSAGE_LENGTH];
+
+    int receiveLength;
+    unsigned short sendLength;
 
     INF_NET_MAC* pBufferToMac;
     INF_NET_MAC* pBufferFromMac;
 
 private:
-    void initSocketFromNet();
-    void initSocketToNet();
+    void initSocketFromApp();
+    void initSocketToApp();
+    void sendToMac();
+    void sendToApp();
 
 public:
     void run();

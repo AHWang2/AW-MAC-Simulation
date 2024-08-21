@@ -24,10 +24,11 @@ private:
 
 // junior interface
 public:
-    INF_PHY_MAC* getBufferFromPhysical();
-    INF_PHY_MAC* getBufferToPhysical();
-    INF_NET_MAC* getBufferFromNet();
-    INF_NET_MAC* getBufferToNet();
+    INF_PHY_MAC* getBufferFromPhysical() {return &bufferFromPhysical;}
+    INF_PHY_MAC* getBufferToPhysical() {return &bufferToPhysical;}
+    INF_NET_MAC* getBufferFromNet() {return &bufferFromNet;}
+    INF_NET_MAC* getBufferToNet() {return &bufferToNet;}
+    unsigned char getNodeID() {return nodeID;}
 
 // senior interface
 public:

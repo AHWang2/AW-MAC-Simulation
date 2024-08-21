@@ -3,32 +3,18 @@
 MAC_NODE::MAC_NODE(int nodeid) : nodeID(nodeid)
 {
     registerNet();
+
+    bufferFromNet.bufferState = INF_NET_MAC_STATE::INF_NET_MAC_STATE_IDLE;
+    bufferToNet.bufferState = INF_NET_MAC_STATE::INF_NET_MAC_STATE_IDLE;
+    bufferFromPhysical.bufferState = INF_PHY_MAC_STATE::INF_PHY_MAC_STATE_IDLE;
+    bufferToPhysical.bufferState = INF_PHY_MAC_STATE::INF_PHY_MAC_STATE_IDLE;
+    
 }
 
 bool MAC_NODE::registerNet()
 {
     netSocketDevice = new NET_SOCKET(nodeID, this->getBufferFromNet(), this->getBufferToNet());
     return true;
-}
-
-INF_PHY_MAC* MAC_NODE::getBufferFromPhysical()
-{
-    return &bufferFromPhysical;
-}
-
-INF_PHY_MAC* MAC_NODE::getBufferToPhysical()
-{
-    return &bufferToPhysical;
-}
-
-INF_NET_MAC* MAC_NODE::getBufferFromNet()
-{
-    return &bufferFromNet;
-}
-
-INF_NET_MAC* MAC_NODE::getBufferToNet()
-{
-    return &bufferToNet;
 }
 
 void MAC_NODE::run()
@@ -54,17 +40,26 @@ void MAC_NODE::run()
         }
 
         // receive from net and send it to physical
-        auto bufferFromNet = getBufferFromNet();
-        if(bufferFromNet->bufferState == INF_NET_MAC_STATE::INF_NET_MAC_STATE_READY)
+        auto tempBufferFromNet = getBufferFromNet();
+        if(tempBufferFromNet->bufferState == INF_NET_MAC_STATE::INF_NET_MAC_STATE_READY)
         {
             if(getBufferToPhysical()->bufferState == INF_PHY_MAC_STATE::INF_PHY_MAC_STATE_IDLE)
             {
                 getBufferToPhysical()->bufferState = INF_PHY_MAC_STATE::INF_PHY_MAC_STATE_READY;
-                getBufferToPhysical()->messageLength = bufferFromNet->messageLength;
-                memcpy(getBufferToPhysical()->buffer, bufferFromNet->buffer, bufferFromNet->messageLength);
+                getBufferToPhysical()->messageLength = tempBufferFromNet->messageLength;
+                memcpy(getBufferToPhysical()->buffer, tempBufferFromNet->buffer, tempBufferFromNet->messageLength);
             }
         }
-        
+
+
+        if(bufferFromNet.bufferState == INF_NET_MAC_STATE::INF_NET_MAC_STATE_ERROR)
+            bufferFromNet.bufferState = INF_NET_MAC_STATE::INF_NET_MAC_STATE_IDLE;
+        if(bufferToNet.bufferState == INF_NET_MAC_STATE::INF_NET_MAC_STATE_ERROR)
+            bufferToNet.bufferState = INF_NET_MAC_STATE::INF_NET_MAC_STATE_IDLE;
+        if(bufferFromPhysical.bufferState == INF_PHY_MAC_STATE::INF_PHY_MAC_STATE_ERROR)
+            bufferFromPhysical.bufferState = INF_PHY_MAC_STATE::INF_PHY_MAC_STATE_IDLE;
+        if(bufferToPhysical.bufferState == INF_PHY_MAC_STATE::INF_PHY_MAC_STATE_ERROR)
+            bufferToPhysical.bufferState = INF_PHY_MAC_STATE::INF_PHY_MAC_STATE_IDLE;
         // std::this_thread::sleep_for(std::chrono::miliseconds(200));
     }
     return;

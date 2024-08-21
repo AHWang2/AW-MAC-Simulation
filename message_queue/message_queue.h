@@ -8,6 +8,7 @@ struct messageUnit
     unsigned char sourceNodeID;
     unsigned char smallSlotNumber;
     unsigned short largeFrameNumber;
+    unsigned short messageLength;
     unsigned char* pbuffer[MAX_MESSAGE_LENGTH];
 };
 #pragma once
@@ -21,6 +22,7 @@ public:
 private:
     queue<messageUnit> messageQueue;
     unordered_set<MAC_NODE*> macNodeSet;
+    vector<MAC_NODE*> macNodeVector;
     int queueLength;
 
 private:
@@ -74,7 +76,7 @@ private:
     
 // senior interface
 public:
-    void registerMac();
+    void registerMac(MAC_NODE* node);
     
     void run();
 };

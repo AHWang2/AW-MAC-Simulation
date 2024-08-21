@@ -1,11 +1,12 @@
 #include "message_queue/message_queue.h"
 #include "mac/mac_node.h"
 #include "net/net_socket.h"
+#include "topo/topo.h"
 
-
-static unsigned short nodeAmount;
-static unsigned short topoType;
+unsigned short nodeAmount;
 static vector<thread> threadLine;
+
+
 
 int main()
 {
@@ -14,12 +15,14 @@ int main()
     cout << "input the topo type: ";
     cin >> topoType;
     
+    topoInit();
+
     MESSAGE_QUEUE messageQueue;
 
     for(int i = 0; i < nodeAmount; i++)
     {
         MAC_NODE node = MAC_NODE(i);
-        messageQueue.registerMac();
+        messageQueue.registerMac(&node);
         threadLine.emplace_back(&MAC_NODE::run, &node);
     }
     // thread
@@ -30,6 +33,6 @@ int main()
             t.join();
     }
 
-    for(;;); sleep(1);
+    for(;;); pause();
     return 0;
 }
